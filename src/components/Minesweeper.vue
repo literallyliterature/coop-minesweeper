@@ -1,0 +1,220 @@
+<template>
+  <v-container
+    class="pt-12"
+    fluid>
+    <v-row
+      justify="center"
+      no-gutters>
+      <v-col
+        cols="auto"
+        style="border:1px solid grey;">
+        <v-row
+          v-for="(row, rowIndex) in blocks"
+          :key="`row-${rowIndex}`"
+          class="flex-nowrap"
+          no-gutters>
+          <v-btn
+            v-for="(cell, colIndex) in row"
+            :key="`row-${rowIndex}-col-${colIndex}`"
+            class="px-0 text-body-1 font-weight-bold"
+            dark
+            large
+            icon
+            plain
+            tile
+            style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
+            :style="`background-color: ${getColour(rowIndex, colIndex)}`"
+            @click="() => {}"
+            @click.left="leftClick(rowIndex, colIndex)"
+            @click.middle.prevent="middleClick(rowIndex, colIndex)"
+            @click.right.prevent="rightClick(rowIndex, colIndex)">
+
+            <!-- {{ getText(cell) }} -->
+            <span v-if="cell.isFlagged">
+              <v-icon
+                large
+                color="green"
+              >
+                mdi-flag
+              </v-icon>
+            </span>
+            <span v-else-if="cell.isVisible && cell.surrounding !== 0">
+              {{ cell.isMine ? 'x' : cell.surrounding }}
+            </span>
+            <span v-else>&nbsp;</span>
+          </v-btn>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+/* eslint-disable max-len */
+
+const numberOfCols = 30;
+const numberOfMines = 99;
+const numberOfRows = 16;
+
+function getRandomInt(max, min = 0) {
+  const intmin = Math.ceil(min);
+  const intmax = Math.floor(max);
+  // The maximum is exclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (intmax - intmin) + intmin);
+}
+
+export default {
+  data: () => ({
+    blocks: [],
+    messedUp: false,
+    zeroClicks: true,
+  }),
+
+  created() {
+    this.blocks = Array.from(
+      { length: numberOfRows },
+      () => Array.from({ length: numberOfCols }, () => ({})),
+    );
+  },
+
+  methods: {
+    getColour(row, col) {
+      if (this.messedUp) return 'error darken-2';
+      // if (this.blocks[row][col].isFlagged) return '#363636';
+      // if (this.blocks[row][col].isVisible && this.blocks[row][col].surrounding === 0) return '#444';
+      if (this.blocks[row][col].isVisible) return '#363636';
+      return '#222';
+    },
+    getText(cell) {
+      return cell.isVisible ? cell.surrounding : '-';
+    },
+    markRandomBlockAsMine() {
+      const randomCol = getRandomInt(numberOfCols);
+      const randomRow = getRandomInt(numberOfRows);
+
+      if (this.blocks[randomRow][randomCol].isMine || this.blocks[randomRow][randomCol].preventMine) this.markRandomBlockAsMine(); // eslint-disable-line
+      else this.$set(this.blocks[randomRow][randomCol], 'isMine', true);
+    },
+    initialiseBlocks() {
+      const vm = this;
+
+      Array.from({ length: numberOfMines }, () => null).forEach(() => vm.markRandomBlockAsMine());
+
+      for (let row = 0; row < numberOfRows; row += 1) {
+        for (let col = 0; col < numberOfCols; col += 1) {
+          vm.setNumberOfSurroundingMines(row, col);
+        }
+      }
+    },
+    leftClick(row, col) {
+      const vm = this;
+      if (this.zeroClicks) {
+        const surroundingBlocks = this.getSurroundingCells(row, col);
+        surroundingBlocks.forEach(([r, c]) => {
+          vm.preventMinesOnSurroundingBlocks(r, c);
+        });
+        this.initialiseBlocks();
+
+        this.zeroClicks = false;
+      }
+
+      const cell = this.blocks[row][col];
+      if (cell.isFlagged || cell.isVisible) return;
+
+      this.$set(this.blocks[row][col], 'isVisible', true); // eslint-disable-line
+
+      if (cell.isMine) this.messedUp = true;
+      else if (cell.surrounding === 0) {
+        const adjacentCells = this.getAdjacentCells(row, col);
+        adjacentCells.forEach(([r, c]) => {
+          const z = this.hasZeroSurrounding;
+          if (
+            !!z
+            || ((z(r, c - 1) || z(r, c + 1))
+            && (z(r - 1, c) || z(r + 1, c)))
+          ) {
+            this.leftClick(r, c);
+          }
+        });
+        const surroundingCells = this.getSurroundingCells(row, col);
+        surroundingCells.forEach(([r, c]) => this.$set(this.blocks[r][c], 'isVisible', true));
+      }
+    },
+    hasZeroSurrounding(row, col) {
+      const cellsInRow = this.blocks[row] || [];
+      const cell = cellsInRow[col] || {};
+      return cell.surrounding === 0;
+    },
+    preventMinesOnSurroundingBlocks(row, col) {
+      const vm = this;
+      const surroundingBlocks = this.getSurroundingCells(row, col);
+      vm.blocks[row][col].preventMine = true;
+      surroundingBlocks.forEach(([r, c]) => {
+        vm.blocks[r][c].preventMine = true;
+      });
+    },
+    middleClick(row, col) {
+      const cell = this.blocks[row][col];
+      const surroundingBlocks = this.getSurroundingCells(row, col);
+      const numberOfSurroundingFlags = surroundingBlocks.filter(([r, c]) => this.blocks[r][c].isFlagged).length;
+      if (numberOfSurroundingFlags >= cell.surrounding) surroundingBlocks.forEach(([r, c]) => this.leftClick(r, c));
+    },
+    rightClick(row, col) {
+      const cell = this.blocks[row][col];
+      this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
+    },
+    getAdjacentCells(row, col) {
+      const surroundingCells = [];
+
+      for (const [r, c] of [ // eslint-disable-line
+        [row - 1, col],
+        [row + 1, col],
+        [row, col - 1],
+        [row, col + 1],
+      ]) {
+        if (
+          (r !== -1)
+          && (c !== -1)
+          && (r !== numberOfRows)
+          && (c !== numberOfCols)
+          && (r !== row || c !== col)
+        ) {
+          surroundingCells.push([r, c]);
+        }
+      }
+
+      return surroundingCells;
+    },
+    getSurroundingCells(row, col) {
+      const surroundingCells = [];
+
+      for (const rd of [-1, 0, 1]) { // eslint-disable-line
+        for (const cd of [-1, 0, 1]) { // eslint-disable-line
+          const r = row + rd;
+          const c = col + cd;
+
+          if (
+            (r !== -1)
+            && (c !== -1)
+            && (r !== numberOfRows)
+            && (c !== numberOfCols)
+            && (r !== row || c !== col)
+          ) {
+            surroundingCells.push([r, c]);
+          }
+        }
+      }
+
+      return surroundingCells;
+    },
+    setNumberOfSurroundingMines(row, col) {
+      if (this.blocks[row][col].isMine) return;
+
+      const cellsToCheck = this.getSurroundingCells(row, col);
+      const cellsWithMines = cellsToCheck.filter(([r, c]) => !!this.blocks[r][c].isMine);
+
+      this.$set(this.blocks[row][col], 'surrounding', cellsWithMines.length);
+    },
+  },
+};
+</script>
