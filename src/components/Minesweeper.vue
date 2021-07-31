@@ -51,6 +51,8 @@
 <script>
 /* eslint-disable max-len */
 
+import Peer from 'peerjs';
+
 const numberOfCols = 30;
 const numberOfMines = 99;
 const numberOfRows = 16;
@@ -74,6 +76,15 @@ export default {
       { length: numberOfRows },
       () => Array.from({ length: numberOfCols }, () => ({})),
     );
+
+    const peer = new Peer();
+    this.peerConn = peer.connect('hopefully-a-completely-random-peers-js-id-to-be-used-for-minesweeper');
+    const vm = this;
+    this.peerConn.on('data', (data) => {
+      if (data.action === 'left-click') vm.leftClick(data.row, data.col);
+      if (data.action === 'right-click') vm.rightClick(data.row, data.col);
+      if (data.action === 'middle-click') vm.middleClick(data.row, data.col);
+    });
   },
 
   methods: {
@@ -106,8 +117,13 @@ export default {
       }
     },
     leftClick(row, col) {
-      const vm = this;
       if (this.messedUp) return;
+      const vm = this;
+      this.peerConn.send({
+        action: 'left-click',
+        row,
+        col,
+      });
 
       if (this.zeroClicks) {
         const surroundingBlocks = this.getSurroundingCells(row, col);
@@ -126,8 +142,8 @@ export default {
 
       if (cell.isMine) this.messedUp = true;
       else if (cell.surrounding === 0) {
-        const adjacentCells = this.getAdjacentCells(row, col);
-        adjacentCells.forEach(([r, c]) => {
+        const surroundingCells = this.getSurroundingCells(row, col);
+        surroundingCells.forEach(([r, c]) => {
           const z = this.hasZeroSurrounding;
           if (
             !!z
@@ -137,8 +153,8 @@ export default {
             this.leftClick(r, c);
           }
         });
-        const surroundingCells = this.getSurroundingCells(row, col);
-        surroundingCells.forEach(([r, c]) => this.$set(this.blocks[r][c], 'isVisible', true));
+        // const surroundingCells = this.getSurroundingCells(row, col);
+        // surroundingCells.forEach(([r, c]) => this.$set(this.blocks[r][c], 'isVisible', true));
       }
     },
     hasZeroSurrounding(row, col) {
@@ -164,6 +180,11 @@ export default {
       const cell = this.blocks[row][col];
       if (this.blocks[row][col].isVisible) return;
       this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
+      this.peerConn.send({
+        action: 'right-click',
+        row,
+        col,
+      });
     },
     getAdjacentCells(row, col) {
       const surroundingCells = [];
