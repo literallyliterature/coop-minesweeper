@@ -1,7 +1,5 @@
 <template>
-  <v-container
-    class="pt-12"
-    fluid>
+  <div class="pt-12">
     <v-row
       justify="center"
       no-gutters>
@@ -18,6 +16,7 @@
             :key="`row-${rowIndex}-col-${colIndex}`"
             class="px-0 text-body-1 font-weight-bold"
             dark
+            :disabled="messedUp"
             large
             icon
             plain
@@ -46,7 +45,7 @@
         </v-row>
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -108,6 +107,8 @@ export default {
     },
     leftClick(row, col) {
       const vm = this;
+      if (this.messedUp) return;
+
       if (this.zeroClicks) {
         const surroundingBlocks = this.getSurroundingCells(row, col);
         surroundingBlocks.forEach(([r, c]) => {
@@ -161,6 +162,7 @@ export default {
     },
     rightClick(row, col) {
       const cell = this.blocks[row][col];
+      if (this.blocks[row][col].isVisible) return;
       this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
     },
     getAdjacentCells(row, col) {
