@@ -41,9 +41,13 @@ export default {
       vm.conn = conn;
 
       vm.conn.on('open', () => {
-        vm.conn.on('data', ({ action, row, col }) => {
-          if (action === 'left-click') vm.$refs.mines.leftClick(row, col);
-          else if (action === 'right-click') vm.$refs.mines.rightClick(row, col);
+        vm.conn.on('data', ({
+          action, blocks, row, col,
+        }) => {
+          if (action === 'left-click') vm.$refs.mines.leftClick(row, col, true);
+          else if (action === 'middle-click') vm.$refs.mines.middleClick(row, col, true);
+          else if (action === 'right-click') vm.$refs.mines.rightClick(row, col, true);
+          else if (action === 'init-blocks') vm.$refs.mines.setBlocks(blocks);
         });
       });
     },

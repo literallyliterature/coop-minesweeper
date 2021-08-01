@@ -115,15 +115,19 @@ export default {
           vm.setNumberOfSurroundingMines(row, col);
         }
       }
+
+      this.$emit('send', {
+        action: 'init-blocks',
+        blocks: this.blocks,
+      });
     },
-    leftClick(row, col) {
+    setBlocks(blocks) {
+      this.zeroClicks = false;
+      this.blocks = blocks;
+    },
+    leftClick(row, col, doNotEmit = false) {
       if (this.messedUp) return;
       const vm = this;
-      this.$emit('send', {
-        action: 'left-click',
-        row,
-        col,
-      });
 
       if (this.zeroClicks) {
         const surroundingBlocks = this.getSurroundingCells(row, col);
@@ -133,6 +137,14 @@ export default {
         this.initialiseBlocks();
 
         this.zeroClicks = false;
+      }
+
+      if (!doNotEmit) {
+        this.$emit('send', {
+          action: 'left-click',
+          row,
+          col,
+        });
       }
 
       const cell = this.blocks[row][col];
@@ -150,7 +162,7 @@ export default {
             || ((z(r, c - 1) || z(r, c + 1))
             && (z(r - 1, c) || z(r + 1, c)))
           ) {
-            this.leftClick(r, c);
+            this.leftClick(r, c, true);
           }
         });
         // const surroundingCells = this.getSurroundingCells(row, col);
@@ -170,21 +182,30 @@ export default {
         vm.blocks[r][c].preventMine = true;
       });
     },
-    middleClick(row, col) {
+    middleClick(row, col, doNotEmit) {
       const cell = this.blocks[row][col];
       const surroundingBlocks = this.getSurroundingCells(row, col);
       const numberOfSurroundingFlags = surroundingBlocks.filter(([r, c]) => this.blocks[r][c].isFlagged).length;
-      if (numberOfSurroundingFlags >= cell.surrounding) surroundingBlocks.forEach(([r, c]) => this.leftClick(r, c));
+      if (numberOfSurroundingFlags >= cell.surrounding) surroundingBlocks.forEach(([r, c]) => this.leftClick(r, c, true));
+      if (!doNotEmit) {
+        this.$emit('send', {
+          action: 'middle-click',
+          row,
+          col,
+        });
+      }
     },
-    rightClick(row, col) {
+    rightClick(row, col, doNotEmit = false) {
       const cell = this.blocks[row][col];
       if (this.blocks[row][col].isVisible) return;
       this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
-      this.$emit('send', {
-        action: 'right-click',
-        row,
-        col,
-      });
+      if (!doNotEmit) {
+        this.$emit('send', {
+          action: 'right-click',
+          row,
+          col,
+        });
+      }
     },
     getAdjacentCells(row, col) {
       const surroundingCells = [];
