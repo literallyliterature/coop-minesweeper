@@ -38,16 +38,7 @@ export default {
 
   methods: {
     startListening(conn) {
-      const vm = this;
-      vm.conn = conn;
-
-      vm.conn.on('open', () => {
-        vm.conn.on('data', (data) => {
-          console.log(data);
-        });
-
-        vm.conn.send('connection opened, hello');
-      });
+      this.$emit('connected', conn);
     },
     useConnectionId() {
       const vm = this;

@@ -119,7 +119,7 @@ export default {
     leftClick(row, col) {
       if (this.messedUp) return;
       const vm = this;
-      this.peerConn.send({
+      this.$emit('send', {
         action: 'left-click',
         row,
         col,
@@ -180,7 +180,7 @@ export default {
       const cell = this.blocks[row][col];
       if (this.blocks[row][col].isVisible) return;
       this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
-      this.peerConn.send({
+      this.$emit('send', {
         action: 'right-click',
         row,
         col,
