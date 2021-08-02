@@ -19,7 +19,7 @@
         </v-icon>
       </v-btn>
 
-      <div>
+      <div v-if="!conn">
         <div class="text-body-2">
           Share id
         </div>
@@ -83,7 +83,8 @@ export default {
         vm.conn.on('data', ({
           action, blocks, row, col,
         }) => {
-          if (action === 'refresh') this.minesKey += 1;
+          if (action === 'refresh') vm.minesKey += 1;
+          else if (action === 'hover') vm.$refs.mines.setConnHover(row, col);
           else if (action === 'left-click') vm.$refs.mines.leftClick(row, col, true);
           else if (action === 'middle-click') vm.$refs.mines.middleClick(row, col, true);
           else if (action === 'right-click') vm.$refs.mines.rightClick(row, col, true);

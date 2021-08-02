@@ -14,6 +14,7 @@
           <v-btn
             v-for="(cell, colIndex) in row"
             :key="`row-${rowIndex}-col-${colIndex}`"
+            @mouseover="sendHoverData(rowIndex, colIndex)"
             class="px-0 text-body-1 font-weight-bold"
             dark
             :disabled="messedUp"
@@ -67,6 +68,9 @@ function getRandomInt(max, min = 0) {
 export default {
   data: () => ({
     blocks: [],
+    connHoverRow: -1,
+    connHoverCol: -1,
+    preventHoverEmit: false,
     messedUp: false,
     zeroClicks: true,
   }),
@@ -92,6 +96,7 @@ export default {
       if (this.messedUp) return 'error darken-2';
       // if (this.blocks[row][col].isFlagged) return '#363636';
       // if (this.blocks[row][col].isVisible && this.blocks[row][col].surrounding === 0) return '#444';
+      if (this.connHoverRow === row && this.connHoverCol === col) return '#363683';
       if (this.blocks[row][col].isVisible) return '#363636';
       return '#222';
     },
@@ -124,6 +129,25 @@ export default {
     setBlocks(blocks) {
       this.zeroClicks = false;
       this.blocks = blocks;
+    },
+    setConnHover(row, col) {
+      this.connHoverRow = row;
+      this.connHoverCol = col;
+    },
+    sendHoverData(row, col) {
+      if (this.preventHoverEmit) return;
+
+      this.$emit('send', {
+        action: 'hover',
+        col,
+        row,
+      });
+
+      const vm = this;
+      vm.preventHoverEmit = true;
+      setTimeout(() => {
+        vm.preventHoverEmit = false;
+      }, 100);
     },
     leftClick(row, col, doNotEmit = false) {
       if (this.messedUp) return;
