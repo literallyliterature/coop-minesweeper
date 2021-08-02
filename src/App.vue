@@ -32,13 +32,13 @@
 
     <v-main>
       <PeerConnector
-        v-if="!startedGame && !conn"
+        v-show="!startedGame && !conn"
         @connected="handleConnection"
         @peer="id => peerId = id"
         @start-game="startedGame = true" />
 
       <Minesweeper
-        v-else
+        v-if="startedGame || conn"
         ref="mines"
         :key="minesKey"
         @send="sendMessage" />
