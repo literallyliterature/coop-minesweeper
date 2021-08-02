@@ -1,13 +1,57 @@
 <template>
-  <div class="pt-12">
+  <div class="pa-12">
     <v-row>
-      <v-text-field label="Connection id" v-model="connectionId" />
-    </v-row>
+      <v-col>
+        <v-card>
+          <v-card-title>
+            Invite someone
+          </v-card-title>
 
-    <v-row>
-      <v-btn block @click="useConnectionId">
-        Use connection id
-      </v-btn>
+          <v-card-subtitle>
+            by sharing the following id
+          </v-card-subtitle>
+
+          <v-card-text>
+            {{ peerId }}
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer />
+
+            <v-btn
+              large
+              @click="$emit('start-game')">
+              Start game
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+
+      <v-col>
+        <v-card>
+          <v-card-title>
+            Join someone's game
+          </v-card-title>
+
+          <v-card-subtitle>
+            by entering their id
+          </v-card-subtitle>
+
+          <v-card-text>
+            <v-text-field label="Connection id" v-model="connectionId" />
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer />
+
+            <v-btn
+              large
+              @click="useConnectionId">
+              Use connection id
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -19,6 +63,7 @@ export default {
   data() {
     return {
       connectionId: '',
+      peerId: '',
     };
   },
 
@@ -27,7 +72,7 @@ export default {
     vm.peer = new Peer();
 
     vm.peer.on('open', (id) => {
-      console.log(`My peer id is ${id}`);
+      vm.$emit('peer', id);
       vm.peerId = id;
     });
 
@@ -44,7 +89,6 @@ export default {
       const vm = this;
 
       const conn = vm.peer.connect(this.connectionId);
-      console.log(`connecting to ${this.connectionId}`);
       vm.startListening(conn);
     },
 
