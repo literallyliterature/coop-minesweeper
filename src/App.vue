@@ -27,12 +27,48 @@
 
       <v-col v-if="!conn" cols="auto">
         <div class="text-body-2">
-          Share id
+          Share ID
         </div>
 
         <div class="text-caption text--secondary">
           {{ peerId }}
         </div>
+      </v-col>
+
+      <v-col cols="auto">
+        <v-menu
+          :close-on-content-click="false"
+          nudge-bottom="16"
+          offset-y>
+          <template #activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>
+                mdi-cog
+              </v-icon>
+            </v-btn>
+          </template>
+
+          <v-card class="pa-4">
+            <v-text-field
+              v-model.number="numberOfRows"
+              label="Rows"
+              type="number" />
+
+            <v-text-field
+              v-model.number="numberOfCols"
+              label="Columns"
+              type="number" />
+
+            <v-text-field
+              v-model.number="numberOfMines"
+              label="Mines"
+              type="number" />
+          </v-card>
+        </v-menu>
       </v-col>
     </v-app-bar>
 
@@ -47,6 +83,9 @@
         v-if="startedGame || conn"
         ref="mines"
         :key="minesKey"
+        :number-of-cols="numberOfCols"
+        :number-of-mines="numberOfMines"
+        :number-of-rows="numberOfRows"
         @send="sendMessage"
         @update:flagged-cells="fc => flaggedCells = fc" />
     </v-main>
@@ -54,7 +93,6 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue';
 import Minesweeper from './components/Minesweeper.vue';
 import PeerConnector from './components/PeerConnector.vue';
 
@@ -62,7 +100,6 @@ export default {
   name: 'App',
 
   components: {
-    // HelloWorld,
     Minesweeper,
     PeerConnector,
   },
@@ -71,6 +108,8 @@ export default {
     conn: null,
     flaggedCells: 0,
     minesKey: 0,
+    numberOfCols: 30,
+    numberOfRows: 16,
     numberOfMines: 99,
     peerId: '',
     startedGame: false,
