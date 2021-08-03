@@ -10,16 +10,22 @@
 
       <v-spacer />
 
-      <v-btn
-        class="mr-4"
-        icon
-        @click="refresh">
-        <v-icon>
-          mdi-refresh
-        </v-icon>
-      </v-btn>
+      <v-col v-if="startedGame || conn" cols="auto">
+        {{ remainingMines }}
+      </v-col>
 
-      <div v-if="!conn">
+      <v-col cols="auto">
+        <v-btn
+          :class="conn ? 'mr-4' : ''"
+          icon
+          @click="refresh">
+          <v-icon>
+            mdi-refresh
+          </v-icon>
+        </v-btn>
+      </v-col>
+
+      <v-col v-if="!conn" cols="auto">
         <div class="text-body-2">
           Share id
         </div>
@@ -27,7 +33,7 @@
         <div class="text-caption text--secondary">
           {{ peerId }}
         </div>
-      </div>
+      </v-col>
     </v-app-bar>
 
     <v-main>
@@ -41,7 +47,8 @@
         v-if="startedGame || conn"
         ref="mines"
         :key="minesKey"
-        @send="sendMessage" />
+        @send="sendMessage"
+        @update:flagged-cells="fc => flaggedCells = fc" />
     </v-main>
   </v-app>
 </template>
@@ -62,10 +69,18 @@ export default {
 
   data: () => ({
     conn: null,
+    flaggedCells: 0,
     minesKey: 0,
+    numberOfMines: 99,
     peerId: '',
     startedGame: false,
   }),
+
+  computed: {
+    remainingMines() {
+      return (this.numberOfMines || 0) - (this.flaggedCells || 0);
+    },
+  },
 
   methods: {
     handleConnection(conn) {
@@ -93,8 +108,9 @@ export default {
       });
     },
     refresh() {
-      this.conn.send({ action: 'refresh' });
+      this.sendMessage({ action: 'refresh' });
       this.minesKey += 1;
+      this.flaggedCells = 0;
     },
     sendMessage(message) {
       if (this.conn) this.conn.send(message);

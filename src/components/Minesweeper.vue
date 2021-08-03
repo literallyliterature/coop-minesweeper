@@ -54,10 +54,6 @@
 
 import Peer from 'peerjs';
 
-const numberOfCols = 30;
-const numberOfMines = 99;
-const numberOfRows = 16;
-
 function getRandomInt(max, min = 0) {
   const intmin = Math.ceil(min);
   const intmax = Math.floor(max);
@@ -66,10 +62,26 @@ function getRandomInt(max, min = 0) {
 }
 
 export default {
+  props: {
+    numberOfCols: {
+      type: Number,
+      default: 30,
+    },
+    numberOfMines: {
+      type: Number,
+      default: 99,
+    },
+    numberOfRows: {
+      type: Number,
+      default: 16,
+    },
+  },
+
   data: () => ({
     blocks: [],
     connHoverRow: -1,
     connHoverCol: -1,
+    numberOfFlaggedCells: 0,
     preventHoverEmit: false,
     messedUp: false,
     zeroClicks: true,
@@ -77,8 +89,8 @@ export default {
 
   created() {
     this.blocks = Array.from(
-      { length: numberOfRows },
-      () => Array.from({ length: numberOfCols }, () => ({})),
+      { length: this.numberOfRows },
+      () => Array.from({ length: this.numberOfCols }, () => ({})),
     );
 
     const peer = new Peer();
@@ -104,8 +116,8 @@ export default {
       return cell.isVisible ? cell.surrounding : '-';
     },
     markRandomBlockAsMine() {
-      const randomCol = getRandomInt(numberOfCols);
-      const randomRow = getRandomInt(numberOfRows);
+      const randomCol = getRandomInt(this.numberOfCols);
+      const randomRow = getRandomInt(this.numberOfRows);
 
       if (this.blocks[randomRow][randomCol].isMine || this.blocks[randomRow][randomCol].preventMine) this.markRandomBlockAsMine(); // eslint-disable-line
       else this.$set(this.blocks[randomRow][randomCol], 'isMine', true);
@@ -113,10 +125,10 @@ export default {
     initialiseBlocks() {
       const vm = this;
 
-      Array.from({ length: numberOfMines }, () => null).forEach(() => vm.markRandomBlockAsMine());
+      Array.from({ length: this.numberOfMines }, () => null).forEach(() => vm.markRandomBlockAsMine());
 
-      for (let row = 0; row < numberOfRows; row += 1) {
-        for (let col = 0; col < numberOfCols; col += 1) {
+      for (let row = 0; row < this.numberOfRows; row += 1) {
+        for (let col = 0; col < this.numberOfCols; col += 1) {
           vm.setNumberOfSurroundingMines(row, col);
         }
       }
@@ -222,7 +234,10 @@ export default {
     rightClick(row, col, doNotEmit = false) {
       const cell = this.blocks[row][col];
       if (this.blocks[row][col].isVisible) return;
-      this.$set(this.blocks[row][col], 'isFlagged', !cell.isFlagged);
+
+      const wasFlagged = cell.isFlagged;
+      this.$set(this.blocks[row][col], 'isFlagged', !wasFlagged);
+      this.$emit('update:flagged-cells', this.numberOfFlaggedCells += (wasFlagged ? -1 : 1));
       if (!doNotEmit) {
         this.$emit('send', {
           action: 'right-click',
@@ -243,8 +258,8 @@ export default {
         if (
           (r !== -1)
           && (c !== -1)
-          && (r !== numberOfRows)
-          && (c !== numberOfCols)
+          && (r !== this.numberOfRows)
+          && (c !== this.numberOfCols)
           && (r !== row || c !== col)
         ) {
           surroundingCells.push([r, c]);
@@ -264,8 +279,8 @@ export default {
           if (
             (r !== -1)
             && (c !== -1)
-            && (r !== numberOfRows)
-            && (c !== numberOfCols)
+            && (r !== this.numberOfRows)
+            && (c !== this.numberOfCols)
             && (r !== row || c !== col)
           ) {
             surroundingCells.push([r, c]);
