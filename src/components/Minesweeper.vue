@@ -2,7 +2,8 @@
   <div class="pt-12">
     <v-row
       justify="center"
-      no-gutters>
+      no-gutters
+      style="min-width: fit-content">
       <v-col
         cols="auto"
         style="border:1px solid grey;">
@@ -11,38 +12,41 @@
           :key="`row-${rowIndex}`"
           class="flex-nowrap"
           no-gutters>
-          <v-btn
+          <v-col
             v-for="(cell, colIndex) in row"
             :key="`row-${rowIndex}-col-${colIndex}`"
-            @mouseover="sendHoverData(rowIndex, colIndex)"
-            class="px-0 text-body-1 font-weight-bold"
-            dark
-            :disabled="messedUp"
-            large
-            icon
-            plain
-            tile
-            style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
-            :style="`background-color: ${getColour(rowIndex, colIndex)}`"
-            @click="() => {}"
-            @click.left="leftClick(rowIndex, colIndex)"
-            @click.middle.prevent="middleClick(rowIndex, colIndex)"
-            @click.right.prevent="rightClick(rowIndex, colIndex)">
+            cols="auto">
+            <v-btn
+              @mouseover="sendHoverData(rowIndex, colIndex)"
+              class="px-0 text-body-1 font-weight-bold"
+              dark
+              :disabled="messedUp"
+              large
+              icon
+              plain
+              tile
+              style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
+              :style="`background-color: ${getColour(rowIndex, colIndex)}`"
+              @click="() => {}"
+              @click.left="leftClick(rowIndex, colIndex)"
+              @click.middle.prevent="middleClick(rowIndex, colIndex)"
+              @click.right.prevent="rightClick(rowIndex, colIndex)">
 
-            <!-- {{ getText(cell) }} -->
-            <span v-if="cell.isFlagged">
-              <v-icon
-                large
-                color="green"
-              >
-                mdi-flag
-              </v-icon>
-            </span>
-            <span v-else-if="cell.isVisible && cell.surrounding !== 0">
-              {{ cell.isMine ? 'x' : cell.surrounding }}
-            </span>
-            <span v-else>&nbsp;</span>
-          </v-btn>
+              <!-- {{ getText(cell) }} -->
+              <span v-if="cell.isFlagged">
+                <v-icon
+                  large
+                  color="green"
+                >
+                  mdi-flag
+                </v-icon>
+              </span>
+              <span v-else-if="cell.isVisible && cell.surrounding !== 0">
+                {{ cell.isMine ? 'x' : cell.surrounding }}
+              </span>
+              <span v-else>&nbsp;</span>
+            </v-btn>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>

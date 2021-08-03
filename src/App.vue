@@ -72,7 +72,7 @@
       </v-col>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="mx-4" style="overflow: auto">
       <PeerConnector
         v-show="!startedGame && !conn"
         @connected="handleConnection"
