@@ -11,4 +11,4 @@ new Vue({
   render: (h) => h(App),
 }).$mount('#app');
 
-Fastclick(document.body);
+document.onload = () => Fastclick(document.body);
