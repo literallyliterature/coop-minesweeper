@@ -25,16 +25,6 @@
         </v-btn>
       </v-col>
 
-      <v-col v-if="!conn" cols="auto">
-        <div class="text-body-2">
-          Share ID
-        </div>
-
-        <div class="text-caption text--secondary">
-          {{ peerId }}
-        </div>
-      </v-col>
-
       <v-col cols="auto">
         <v-switch
           class="mb-n5"
@@ -79,6 +69,26 @@
               v-model.number="numberOfMines"
               label="Mines"
               type="number" />
+
+            <v-row v-if="!conn" dense>
+              <v-col>
+                <div class="text-body-2">
+                  Share ID
+                </div>
+
+                <div class="text-caption text--secondary" id="share-id-div-in-menu">
+                  {{ peerId }}
+                </div>
+              </v-col>
+
+              <v-col cols="auto">
+                <v-btn icon @click="copyToClipboard('share-id-div-in-menu')">
+                  <v-icon>
+                    mdi-content-copy
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-card>
         </v-menu>
       </v-col>
@@ -88,6 +98,7 @@
       <PeerConnector
         v-show="!startedGame && !conn"
         @connected="handleConnection"
+        @copy-to-clipboard="copyToClipboard"
         @peer="id => peerId = id"
         @start-game="startedGame = true" />
 
@@ -165,6 +176,19 @@ export default {
   },
 
   methods: {
+    copyToClipboard(containerid) {
+      if (document.selection) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select().createTextRange();
+        document.execCommand('copy');
+      } else if (window.getSelection) {
+        const range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+      }
+    },
     handleConnection(conn) {
       const vm = this;
       vm.conn = conn;

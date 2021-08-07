@@ -12,7 +12,19 @@
           </v-card-subtitle>
 
           <v-card-text>
-            {{ peerId }}
+            <v-row dense>
+              <v-col id="peer-connector-share-id">
+                {{ peerId }}
+              </v-col>
+
+              <v-col cols="auto">
+                <v-btn icon @click="$emit('copy-to-clipboard', 'peer-connector-share-id')">
+                  <v-icon>
+                    mdi-content-copy
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-card-text>
 
           <v-card-actions>
