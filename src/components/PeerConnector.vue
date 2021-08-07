@@ -69,9 +69,7 @@ export default {
 
   created() {
     const vm = this;
-    vm.peer = {
-      on: () => {},
-    } || new Peer();
+    vm.peer = new Peer();
 
     vm.peer.on('open', (id) => {
       vm.$emit('peer', id);
