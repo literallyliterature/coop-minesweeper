@@ -5,11 +5,12 @@
 # abort on errors
 set -e
 # navigate into the build output directory
-cd dist
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
+docker-compose run ui npm run build
+cd dist
 git init
 git add -A
 git commit -m 'deploy'
 git push -f git@github.com:literallyliterature/coop-minesweeper.git master:gh-pages
-cd -
+cd ..
