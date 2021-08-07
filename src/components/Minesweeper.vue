@@ -98,6 +98,29 @@ export default {
     zeroClicks: true,
   }),
 
+  computed: {
+    flattenedBlocks() {
+      return this.blocks.reduce((acc, row) => [
+        ...acc,
+        ...row,
+      ], []);
+    },
+    isGameWon() {
+      return !this.messedUp && this.flattenedBlocks
+        .filter((b) => !b.isVisible)
+        .length === this.numberOfMines;
+    },
+  },
+
+  watch: {
+    isGameWon(val) {
+      if (val) this.$emit('game-won');
+    },
+    messedUp(val) {
+      if (val) this.$emit('game-lost');
+    },
+  },
+
   created() {
     this.blocks = Array.from(
       { length: this.numberOfRows },

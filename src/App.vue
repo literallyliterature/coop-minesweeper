@@ -86,9 +86,32 @@
         :number-of-cols="numberOfCols"
         :number-of-mines="numberOfMines"
         :number-of-rows="numberOfRows"
+        @game-lost="showSnackbar(false)"
+        @game-won="showSnackbar(true)"
         @send="sendMessage"
         @update:flagged-cells="fc => flaggedCells = fc" />
     </v-main>
+
+    <v-snackbar
+      v-model="showingSnackbar"
+      :color="snackbarColour"
+      top
+    >
+      {{ snackbarText }}
+
+      <template
+        v-if="showingRefreshInSnackbar"
+        #action="{ attrs }">
+        <v-btn
+          icon
+          v-bind="attrs"
+          @click="() => { refresh(); showingSnackbar = false; }">
+          <v-icon>
+            mdi-refresh
+          </v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -112,6 +135,10 @@ export default {
     numberOfRows: 16,
     numberOfMines: 99,
     peerId: '',
+    showingRefreshInSnackbar: false,
+    showingSnackbar: false,
+    snackbarColour: 'error',
+    snackbarText: '',
     startedGame: false,
   }),
 
@@ -153,6 +180,28 @@ export default {
     },
     sendMessage(message) {
       if (this.conn) this.conn.send(message);
+    },
+    async showSnackbar(won = true) {
+      const wait = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      if (won) {
+        this.showingRefreshInSnackbar = true;
+        this.snackbarColour = 'success';
+        this.snackbarText = 'Woot woot!';
+        this.showingSnackbar = true;
+      } else {
+        this.snackbarColour = 'error darken-2';
+        this.snackbarText = 'Oh no!';
+        this.showingRefreshInSnackbar = false;
+        this.showingSnackbar = true;
+        await wait(2500);
+        this.showingSnackbar = false;
+
+        await wait(500);
+        this.snackbarText = 'It\'s ok';
+        this.showingRefreshInSnackbar = true;
+        this.showingSnackbar = true;
+      }
     },
   },
 };
