@@ -28,9 +28,15 @@
               style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
               :style="`background-color: ${getColour(rowIndex, colIndex)}`"
               @click="() => {}"
-              @click.left="leftClick(rowIndex, colIndex)"
+              @click.left="() => mobileMode ?
+                (cell.isVisible ?
+                  middleClick(rowIndex, colIndex) :
+                  rightClick(rowIndex, colIndex)) :
+                leftClick(rowIndex, colIndex)"
               @click.middle.prevent="middleClick(rowIndex, colIndex)"
-              @click.right.prevent="rightClick(rowIndex, colIndex)">
+              @click.right.prevent="mobileMode ?
+                leftClick(rowIndex, colIndex) :
+                rightClick(rowIndex, colIndex)">
 
               <span v-if="cell.isFlagged">
                 <v-icon
@@ -74,6 +80,10 @@ function getRandomInt(max, min = 0) {
 
 export default {
   props: {
+    mobileMode: {
+      type: Boolean,
+      default: false,
+    },
     numberOfCols: {
       type: Number,
       default: 30,

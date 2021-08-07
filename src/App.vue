@@ -95,6 +95,7 @@
         v-if="startedGame || conn"
         ref="mines"
         :key="minesKey"
+        :mobile-mode="mobileMode"
         :number-of-cols="numberOfCols"
         :number-of-mines="numberOfMines"
         :number-of-rows="numberOfRows"
@@ -144,7 +145,7 @@ export default {
       conn: null,
       flaggedCells: 0,
       minesKey: 0,
-      mobileMode: this.$vuetify.breakpoint.xsOnly,
+      mobileMode: false,
       numberOfCols: 30,
       numberOfRows: 16,
       numberOfMines: 99,
