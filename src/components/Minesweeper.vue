@@ -32,7 +32,6 @@
               @click.middle.prevent="middleClick(rowIndex, colIndex)"
               @click.right.prevent="rightClick(rowIndex, colIndex)">
 
-              <!-- {{ getText(cell) }} -->
               <span v-if="cell.isFlagged">
                 <v-icon
                   large
@@ -118,8 +117,6 @@ export default {
   methods: {
     getColour(row, col) {
       if (this.messedUp) return 'error darken-2';
-      // if (this.blocks[row][col].isFlagged) return '#363636';
-      // if (this.blocks[row][col].isVisible && this.blocks[row][col].surrounding === 0) return '#444';
       if (this.connHoverRow === row && this.connHoverCol === col) return '#363683';
       if (this.blocks[row][col].isVisible) return '#363636';
       return '#222';
@@ -213,8 +210,6 @@ export default {
             this.leftClick(r, c, true);
           }
         });
-        // const surroundingCells = this.getSurroundingCells(row, col);
-        // surroundingCells.forEach(([r, c]) => this.$set(this.blocks[r][c], 'isVisible', true));
       }
     },
     hasZeroSurrounding(row, col) {
