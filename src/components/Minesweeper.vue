@@ -20,7 +20,7 @@
               @mouseover="sendHoverData(rowIndex, colIndex)"
               class="px-0 text-body-1 font-weight-bold"
               dark
-              :disabled="messedUp"
+              :disabled="(messedUp && !cell.isMine)"
               large
               icon
               plain
@@ -41,8 +41,16 @@
                   mdi-flag
                 </v-icon>
               </span>
-              <span v-else-if="cell.isVisible && cell.surrounding !== 0">
-                {{ cell.isMine ? 'x' : cell.surrounding }}
+              <span v-else-if="messedUp && cell.isMine">
+                <v-icon
+                  large
+                  color="error"
+                >
+                  mdi-mine
+                </v-icon>
+              </span>
+              <span v-else-if="(cell.isVisible && cell.surrounding !== 0)">
+                {{ cell.surrounding }}
               </span>
               <span v-else>&nbsp;</span>
             </v-btn>
