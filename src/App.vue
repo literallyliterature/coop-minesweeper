@@ -4,7 +4,7 @@
       app
       color="#222"
     >
-      <div class="text-h6">
+      <div v-if="$vuetify.breakpoint.smAndUp" class="text-h6">
         Minesweeper
       </div>
 
@@ -33,6 +33,18 @@
         <div class="text-caption text--secondary">
           {{ peerId }}
         </div>
+      </v-col>
+
+      <v-col cols="auto">
+        <v-switch
+          class="mb-n5"
+          v-model="mobileMode">
+          <template #label>
+            <v-icon>
+              mdi-cellphone
+            </v-icon>
+          </template>
+        </v-switch>
       </v-col>
 
       <v-col cols="auto">
@@ -127,20 +139,23 @@ export default {
     PeerConnector,
   },
 
-  data: () => ({
-    conn: null,
-    flaggedCells: 0,
-    minesKey: 0,
-    numberOfCols: 30,
-    numberOfRows: 16,
-    numberOfMines: 99,
-    peerId: '',
-    showingRefreshInSnackbar: false,
-    showingSnackbar: false,
-    snackbarColour: 'error',
-    snackbarText: '',
-    startedGame: false,
-  }),
+  data() {
+    return {
+      conn: null,
+      flaggedCells: 0,
+      minesKey: 0,
+      mobileMode: this.$vuetify.breakpoint.xsOnly,
+      numberOfCols: 30,
+      numberOfRows: 16,
+      numberOfMines: 99,
+      peerId: '',
+      showingRefreshInSnackbar: false,
+      showingSnackbar: false,
+      snackbarColour: 'error',
+      snackbarText: '',
+      startedGame: false,
+    };
+  },
 
   computed: {
     remainingMines() {
