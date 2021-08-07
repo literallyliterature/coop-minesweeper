@@ -217,12 +217,14 @@ export default {
       this.sendMessage({ action: 'refresh' });
       this.minesKey += 1;
       this.flaggedCells = 0;
+      this.showingSnackbar = false;
     },
     sendMessage(message) {
       if (this.conn) this.conn.send(message);
     },
     async showSnackbar(won = true) {
       const wait = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const minesKeyAtStartOfFn = this.minesKey;
 
       if (won) {
         this.showingRefreshInSnackbar = true;
@@ -240,7 +242,7 @@ export default {
         await wait(500);
         this.snackbarText = 'It\'s ok';
         this.showingRefreshInSnackbar = true;
-        this.showingSnackbar = true;
+        if (minesKeyAtStartOfFn === this.minesKey) this.showingSnackbar = true;
       }
     },
   },
