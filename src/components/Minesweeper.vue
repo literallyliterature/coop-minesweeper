@@ -47,7 +47,7 @@
                       leftClick(rowIndex, colIndex) :
                       rightClick(rowIndex, colIndex))">
 
-                  <span v-if="cell.isFlagged">
+                  <span v-if="cell.isFlagged || isGameWon">
                     <v-icon
                       large
                       color="green"
