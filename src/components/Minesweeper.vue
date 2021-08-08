@@ -16,56 +16,60 @@
             v-for="(cell, colIndex) in row"
             :key="`row-${rowIndex}-col-${colIndex}`"
             cols="auto">
-            <v-btn
-              @mouseover="sendHoverData(rowIndex, colIndex)"
-              class="px-0 text-body-1 font-weight-bold"
-              dark
-              :disabled="(messedUp && !cell.isMine)"
-              large
-              icon
-              plain
-              tile
-              style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
-              :style="`background-color: ${getColour(rowIndex, colIndex)}`"
-              v-long-click="() => $vuetify.breakpoint.xsOnly ?
-                (mobileMode ?
-                  leftClick(rowIndex, colIndex) :
-                  rightClick(rowIndex, colIndex)) :
-                {}"
-              @click="() => {}"
-              @click.left="() => mobileMode ?
-                (cell.isVisible ?
-                  middleClick(rowIndex, colIndex) :
-                  rightClick(rowIndex, colIndex)) :
-                leftClick(rowIndex, colIndex)"
-              @click.middle.prevent="middleClick(rowIndex, colIndex)"
-              @click.right.prevent="() => $vuetify.breakpoint.xsOnly ?
-                {} :
-                (mobileMode ?
-                  leftClick(rowIndex, colIndex) :
-                  rightClick(rowIndex, colIndex))">
+            <v-hover>
+              <template #default="{ hover }">
+                <v-btn
+                  @mouseover="sendHoverData(rowIndex, colIndex)"
+                  class="px-0 text-body-1 font-weight-bold"
+                  dark
+                  :disabled="(messedUp && !cell.isMine)"
+                  large
+                  icon
+                  plain
+                  tile
+                  style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
+                  :style="`background-color: ${hover ? '#555' : getColour(rowIndex, colIndex)}`"
+                  v-long-click="() => $vuetify.breakpoint.xsOnly ?
+                    (mobileMode ?
+                      leftClick(rowIndex, colIndex) :
+                      rightClick(rowIndex, colIndex)) :
+                    {}"
+                  @click="() => {}"
+                  @click.left="() => mobileMode ?
+                    (cell.isVisible ?
+                      middleClick(rowIndex, colIndex) :
+                      rightClick(rowIndex, colIndex)) :
+                    leftClick(rowIndex, colIndex)"
+                  @click.middle.prevent="middleClick(rowIndex, colIndex)"
+                  @click.right.prevent="() => $vuetify.breakpoint.xsOnly ?
+                    {} :
+                    (mobileMode ?
+                      leftClick(rowIndex, colIndex) :
+                      rightClick(rowIndex, colIndex))">
 
-              <span v-if="cell.isFlagged">
-                <v-icon
-                  large
-                  color="green"
-                >
-                  mdi-flag
-                </v-icon>
-              </span>
-              <span v-else-if="messedUp && cell.isMine">
-                <v-icon
-                  large
-                  color="error"
-                >
-                  mdi-mine
-                </v-icon>
-              </span>
-              <span v-else-if="(cell.isVisible && cell.surrounding !== 0)">
-                {{ cell.surrounding }}
-              </span>
-              <span v-else>&nbsp;</span>
-            </v-btn>
+                  <span v-if="cell.isFlagged">
+                    <v-icon
+                      large
+                      color="green"
+                    >
+                      mdi-flag
+                    </v-icon>
+                  </span>
+                  <span v-else-if="messedUp && cell.isMine">
+                    <v-icon
+                      large
+                      color="error"
+                    >
+                      mdi-mine
+                    </v-icon>
+                  </span>
+                  <span v-else-if="(cell.isVisible && cell.surrounding !== 0)">
+                    {{ cell.surrounding }}
+                  </span>
+                  <span v-else>&nbsp;</span>
+                </v-btn>
+              </template>
+            </v-hover>
           </v-col>
         </v-row>
       </v-col>
