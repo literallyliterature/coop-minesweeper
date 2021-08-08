@@ -177,6 +177,7 @@ export default {
 
   watch: {
     minesKey() {
+      this.flaggedCells = 0;
       this.showingSnackbar = false;
     },
   },
@@ -222,7 +223,6 @@ export default {
     refresh() {
       this.sendMessage({ action: 'refresh' });
       this.minesKey += 1;
-      this.flaggedCells = 0;
     },
     sendMessage(message) {
       if (this.conn) this.conn.send(message);
