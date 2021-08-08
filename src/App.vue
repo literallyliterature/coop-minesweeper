@@ -175,6 +175,12 @@ export default {
     },
   },
 
+  watch: {
+    minesKey() {
+      this.showingSnackbar = false;
+    },
+  },
+
   methods: {
     copyToClipboard(containerid) {
       if (document.selection) {
@@ -217,7 +223,6 @@ export default {
       this.sendMessage({ action: 'refresh' });
       this.minesKey += 1;
       this.flaggedCells = 0;
-      this.showingSnackbar = false;
     },
     sendMessage(message) {
       if (this.conn) this.conn.send(message);
