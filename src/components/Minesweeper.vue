@@ -29,23 +29,15 @@
                   tile
                   style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
                   :style="`background-color: ${hover ? '#555' : getColour(rowIndex, colIndex)}`"
-                  v-long-click="() => $vuetify.breakpoint.xsOnly ?
-                    (mobileMode ?
-                      leftClick(rowIndex, colIndex) :
-                      rightClick(rowIndex, colIndex)) :
-                    {}"
-                  @click="() => {}"
                   @click.left="() => mobileMode ?
                     (cell.isVisible ?
                       middleClick(rowIndex, colIndex) :
                       rightClick(rowIndex, colIndex)) :
                     leftClick(rowIndex, colIndex)"
                   @click.middle.prevent="middleClick(rowIndex, colIndex)"
-                  @click.right.prevent="() => $vuetify.breakpoint.xsOnly ?
-                    {} :
-                    (mobileMode ?
+                  @contextmenu.prevent="() => mobileMode ?
                       leftClick(rowIndex, colIndex) :
-                      rightClick(rowIndex, colIndex))">
+                      rightClick(rowIndex, colIndex)">
 
                   <span v-if="cell.isFlagged || isGameWon">
                     <v-icon
