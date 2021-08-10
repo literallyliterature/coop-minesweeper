@@ -28,7 +28,11 @@
                   plain
                   tile
                   style="box-sizing:border-box; border: 1px solid #272727; color: #b8b8b8"
-                  :style="`background-color: ${hover ? '#555' : getColour(rowIndex, colIndex)}`"
+                  :style="{
+                    'background-color': hover && !cell.isVisible && !cell.isFlagged ?
+                      '#555' :
+                      getColour(rowIndex, colIndex),
+                  }"
                   @click.left="() => mobileMode ?
                     (cell.isVisible ?
                       middleClick(rowIndex, colIndex) :
