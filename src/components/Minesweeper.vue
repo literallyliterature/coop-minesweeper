@@ -33,7 +33,7 @@
                       '#555' :
                       getColour(rowIndex, colIndex),
                   }"
-                  @click.left="() => mobileMode ?
+                  @click.left.prevent="() => mobileMode ?
                     (cell.isVisible ?
                       middleClick(rowIndex, colIndex) :
                       rightClick(rowIndex, colIndex)) :
