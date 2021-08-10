@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-12">
+  <div class="pt-12" style="touch-action: manipulation">
     <v-row
       justify="center"
       no-gutters
